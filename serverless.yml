@@ -1,0 +1,18 @@
+service:
+  name: bible-translator
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+functions:
+  index:
+    handler: src/handlers/index.index
+    events:
+      - http:
+          method: get
+          path: /

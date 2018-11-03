@@ -1,0 +1,43 @@
+{
+  "name": "bible-translator",
+  "version": "1.0.0",
+  "description": "A bible translator from one language to another for the purpose of learning a language.",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "test": "jest",
+  "dependencies": {
+    "async-lock": "^1.1.3",
+    "iso-639-3": "^1.1.0",
+    "node-fetch": "^2.2.0",
+    "sanitize-html": "^1.19.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.1",
+    "@types/jest": "^23.3.9",
+    "@types/node": "^8.0.57",
+    "@types/node-fetch": "^2.1.2",
+    "@types/striptags": "^3.1.1",
+    "gts": "^0.8.0",
+    "jest": "^23.6.0",
+    "serverless-dynamic-dotenv": "^1.0.2",
+    "serverless-offline": "^3.31.0",
+    "serverless-webpack": "^5.1.1",
+    "source-map-support": "^0.5.6",
+    "ts-jest": "^23.10.4",
+    "ts-loader": "^4.2.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.5.0"
+  },
+  "author": "R. Stephen Guerra",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rguerra712/bible-translator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rguerra712/bible-translator/issues"
+  },
+  "homepage": "https://github.com/rguerra712/bible-translator#readme"
+}
