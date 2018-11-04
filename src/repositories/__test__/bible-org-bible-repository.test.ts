@@ -23,11 +23,13 @@ describe('getBibles', () => {
         const bibles = await repository.getBibles();
 
         // Assert
-        expect(bibles).toContainEqual({ id: 'spa-BHTI', name: 'La Biblia Hispanoamericana (Traducción Interconfesional, versión hispanoamericana)', languageId: 'spa'});
+        // Should not contain inactive
+        expect(bibles).not.toContainEqual({ id: 'spa-BHTI', name: 'La Biblia Hispanoamericana (Traducción Interconfesional, versión hispanoamericana)', languageId: 'spa' });
+        expect(bibles).toContainEqual({ id: 'spa-RVR1960', name: 'Biblia Reina Valera 1960', languageId: 'spa'});
     }, 30000);
 
 
-    it('should only contain known bible in English if searching just for English', async () => {
+    it('should only contain known bibles in English if searching just for English', async () => {
         // Arrange
         const repository = new BibleOrgBibleRepository(languagesRepository);
 
@@ -36,7 +38,8 @@ describe('getBibles', () => {
 
         // Assert
         expect(bibles).toContainEqual({ id: 'eng-KJV', name: 'King James Version', languageId: 'eng-GB' });
-        expect(bibles).not.toContainEqual({ id: 'spa-BHTI', name: 'La Biblia Hispanoamericana (Traducción Interconfesional, versión hispanoamericana)', languageId: 'spa' });
+        expect(bibles).toContainEqual({ id: 'eng-NASB', name: 'New American Standard Bible', languageId: 'eng-US' });
+        expect(bibles).not.toContainEqual({ id: 'spa-BHTI', name: 'Biblia Reina Valera 1960', languageId: 'spa'});
     }, 30000);
 
 
@@ -49,7 +52,7 @@ describe('getBibles', () => {
 
         // Assert
         expect(bibles).not.toContainEqual({ id: 'eng-KJV', name: 'King James Version', languageId: 'eng-GB' });
-        expect(bibles).toContainEqual({ id: 'spa-BHTI', name: 'La Biblia Hispanoamericana (Traducción Interconfesional, versión hispanoamericana)', languageId: 'spa' });
+        expect(bibles).toContainEqual({ id: 'spa-RVR1960', name: 'Biblia Reina Valera 1960', languageId: 'spa' });
     }, 30000);
 });
 
@@ -110,7 +113,7 @@ describe('getChapters', () => {
         const books = await repository.getChapters('eng-GNTD:2Tim');
 
         // Assert
-        expect(books).toContainEqual({ id: 'eng-GNTD:2Tim.2', number: '2', nextId: 'eng-GNTD:2Tim.3', previousId: 'eng-GNTD:2Tim.1' });
+        expect(books).toContainEqual({ id: 'eng-GNTD:2Tim.2', name: '2', number: '2', nextId: 'eng-GNTD:2Tim.3', previousId: 'eng-GNTD:2Tim.1' });
     }, 30000);
 
     it('should contain 2nd timothy with known chapters if just a previous', async () => {
@@ -121,7 +124,7 @@ describe('getChapters', () => {
         const books = await repository.getChapters('eng-GNTD:2Tim');
 
         // Assert
-        expect(books).toContainEqual({ id: 'eng-GNTD:2Tim.1', number: '1', nextId: 'eng-GNTD:2Tim.2', previousId: 'eng-GNTD:2Tim.int' });
+        expect(books).toContainEqual({ id: 'eng-GNTD:2Tim.1', name: '1', number: '1', nextId: 'eng-GNTD:2Tim.2', previousId: 'eng-GNTD:2Tim.int' });
     }, 30000);
 
     it('should contain 2nd timothy with known chapters if just a next', async () => {
@@ -132,8 +135,9 @@ describe('getChapters', () => {
         const books = await repository.getChapters('eng-GNTD:2Tim');
 
         // Assert
-        expect(books).toContainEqual({ id: 'eng-GNTD:2Tim.4', number: '4', nextId: 'eng-GNTD:Titus.int', previousId: 'eng-GNTD:2Tim.3' });
+        expect(books).toContainEqual({ id: 'eng-GNTD:2Tim.4', name: '4', number: '4', nextId: 'eng-GNTD:Titus.int', previousId: 'eng-GNTD:2Tim.3' });
     }, 30000);
+
 });
 
 describe('getChapterText', () => {

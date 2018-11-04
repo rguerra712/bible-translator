@@ -22,15 +22,23 @@ export class BibleOrgBibleRepository implements BibleRepository {
                 authorization: `Basic ${Buffer.from(apiKey + ':X').toString('base64')}`
             }
         });
+        if (response.status !== 200) {
+            throw new Error(`Unsuccessful response ${response.status} with body ${await response.text()}`);
+        }
         return await response.json();
     }
 
     async getSupportedLanguages(): Promise<Language[]> {
         const allLanguages = this.languagesRepository.getIso6393Languages();
         const bibles = await this.getBibles();
-        return allLanguages.filter(language => 
-            bibles.some(bible => 
-                bible.languageId.startsWith(language.id)));
+        const languageFiltered = allLanguages.filter(language => 
+            bibles.some(bible => this.isMatch(bible, language.id)));
+        return languageFiltered;
+    }
+
+    private isMatch(bible:Bible, languageId:string): boolean {
+        return bible.languageId === languageId
+            || bible.languageId.startsWith(languageId + '-');
     }
 
     async getBibles(languageId?:string): Promise<Bible[]> {
@@ -38,16 +46,18 @@ export class BibleOrgBibleRepository implements BibleRepository {
             await lock.acquire("allBibles", async () => {
                 if (!allBibles) {
                     const json = await this.get('versions.json');
-                    allBibles = json.map(bible => ({
-                        id: bible.id,
-                        name: bible.name,
-                        languageId: bible.lang,
-                    }));
+                    allBibles = json
+                        .filter(bible => bible.active_api === 1)
+                        .map(bible => ({
+                            id: bible.id,
+                            name: bible.name,
+                            languageId: bible.lang,
+                        }));
                 }
             });
         }
         if (languageId) {
-            return allBibles.filter(bible => bible.languageId.startsWith(languageId));
+            return allBibles.filter(bible => this.isMatch(bible, languageId));
         }
         return allBibles;
     }
@@ -72,6 +82,7 @@ export class BibleOrgBibleRepository implements BibleRepository {
                 number: c.chapter,
                 nextId: null,
                 previousId: null,
+                name: c.chapter,
             };
             if (c.next && c.next.chapter) {
                 chapter.nextId = c.next.chapter.id;

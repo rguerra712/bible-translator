@@ -13,6 +13,9 @@ module.exports = {
   devtool: 'source-map',
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    alias: {
+      'node-fetch$': "node-fetch/lib/index.js"
+    }
   },
   output: {
     libraryTarget: 'commonjs',
