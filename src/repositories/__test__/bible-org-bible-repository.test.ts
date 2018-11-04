@@ -29,19 +29,31 @@ describe('getBibles', () => {
     }, 30000);
 
 
-    it('should only contain known bibles in English if searching just for English', async () => {
+    it('should only contain known bibles in US English if searching just for US English', async () => {
         // Arrange
         const repository = new BibleOrgBibleRepository(languagesRepository);
 
         // Act
-        const bibles = await repository.getBibles('eng');
+        const bibles = await repository.getBibles('eng-US');
 
         // Assert
-        expect(bibles).toContainEqual({ id: 'eng-KJV', name: 'King James Version', languageId: 'eng-GB' });
+        expect(bibles).not.toContainEqual({ id: 'eng-KJV', name: 'King James Version', languageId: 'eng-GB' });
         expect(bibles).toContainEqual({ id: 'eng-NASB', name: 'New American Standard Bible', languageId: 'eng-US' });
         expect(bibles).not.toContainEqual({ id: 'spa-BHTI', name: 'Biblia Reina Valera 1960', languageId: 'spa'});
     }, 30000);
 
+    it('should only contain known bibles in UK English if searching just for UK English', async () => {
+        // Arrange
+        const repository = new BibleOrgBibleRepository(languagesRepository);
+
+        // Act
+        const bibles = await repository.getBibles('eng-GB');
+
+        // Assert
+        expect(bibles).toContainEqual({ id: 'eng-KJV', name: 'King James Version', languageId: 'eng-GB' });
+        expect(bibles).not.toContainEqual({ id: 'eng-NASB', name: 'New American Standard Bible', languageId: 'eng-US' });
+        expect(bibles).not.toContainEqual({ id: 'spa-BHTI', name: 'Biblia Reina Valera 1960', languageId: 'spa' });
+    }, 30000);
 
     it('should only contain known bible in Spanish if searching just for Spanish', async () => {
         // Arrange
@@ -57,7 +69,7 @@ describe('getBibles', () => {
 });
 
 describe('getLanguages', () => {
-    it('should contain english as known language', async () => {
+    it('should contain US english as known language', async () => {
         // Arrange
         const repository = new BibleOrgBibleRepository(languagesRepository);
 
@@ -65,7 +77,18 @@ describe('getLanguages', () => {
         const languages = await repository.getSupportedLanguages();
 
         // Assert
-        expect(languages).toContainEqual({ id: 'eng', name: 'English' });
+        expect(languages).toContainEqual({ id: 'eng-GB', name: 'English (UK)' });
+    }, 30000);
+
+    it('should contain US english as known language', async () => {
+        // Arrange
+        const repository = new BibleOrgBibleRepository(languagesRepository);
+
+        // Act
+        const languages = await repository.getSupportedLanguages();
+
+        // Assert
+        expect(languages).toContainEqual({ id: 'eng-US', name: 'English (US)' });
     }, 30000);
 
     it('should contain spanish as known language', async () => {
@@ -79,16 +102,6 @@ describe('getLanguages', () => {
         expect(languages).toContainEqual({ id: 'spa', name: 'Spanish' });
     }, 30000);
 
-    it('should not contain Enets as known language', async () => {
-        // Arrange
-        const repository = new BibleOrgBibleRepository(languagesRepository);
-
-        // Act
-        const languages = await repository.getSupportedLanguages();
-
-        // Assert
-        expect(languages).not.toContainEqual({ id: 'enf', name: 'Forest Enets' });
-    }, 30000);
 });
 
 describe('getBooks', () => {
