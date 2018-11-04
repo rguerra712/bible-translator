@@ -1,22 +1,20 @@
-export interface Chapter {
+export interface HasNameAndId {
+    name: string;
     id: string;
-    number: string;
+}
+
+export interface Chapter extends HasNameAndId {
     nextId: string;
     previousId: string;
+    name: string;
 }
 
-export interface Book {
-    name: string;
-    id: string;
+export interface Book extends HasNameAndId {
 }
 
-export interface Bible {
-    name: string;
-    id: string;
+export interface Bible extends HasNameAndId {
     languageId: string;
 }
 
-export interface Language {
-    name: string;
-    id: string;
+export interface Language extends HasNameAndId {
 }

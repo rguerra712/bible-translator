@@ -2,6 +2,7 @@ service:
   name: bible-translator
 
 plugins:
+  - serverless-dynamic-dotenv
   - serverless-offline
   - serverless-webpack
 
