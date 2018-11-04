@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import { Book, Bible, Language, Chapter } from '../types';
 import { LanguagesRepository } from './languages-repository';
 import * as santizeHtml  from 'sanitize-html';
+import * as _ from 'lodash';
 
 var AsyncLock = require('async-lock');
 var lock = new AsyncLock();
@@ -29,24 +30,33 @@ export class BibleOrgBibleRepository implements BibleRepository {
     }
 
     async getSupportedLanguages(): Promise<Language[]> {
-        const allLanguages = this.languagesRepository.getIso6393Languages();
-        const bibles = await this.getBibles();
-        const languageFiltered = allLanguages.filter(language => 
-            bibles.some(bible => this.isMatch(bible, language.id)));
-        return languageFiltered;
-    }
-
-    private isMatch(bible:Bible, languageId:string): boolean {
-        return bible.languageId === languageId
-            || bible.languageId.startsWith(languageId + '-');
+        // TODO Huge performance gain, need to revisit
+        // const allLanguages = this.languagesRepository.getIso6393Languages();
+        const allLanguages = this.languagesRepository.getIso6393CommonLanguages();
+        const allLanguageExcept = allLanguages.filter(language => language.id !== 'eng');
+        const languages = [
+            { id: 'eng-GB', name: 'English (UK)' },
+            { id: 'eng-US', name: 'English (US)' },
+            ...allLanguageExcept];
+        return _.orderBy(languages, language => language.name);
     }
 
     async getBibles(languageId?:string): Promise<Bible[]> {
+        if (languageId) {
+            const bibles = (await this.get(`versions.json?language=${languageId}`))
+                .filter(bible => bible.active_api === 1)
+                ;
+            return bibles.map(bible => ({
+                id: bible.id,
+                name: bible.name,
+                languageId: bible.lang,
+            }));
+        }
         if (!allBibles) {
             await lock.acquire("allBibles", async () => {
                 if (!allBibles) {
                     const json = await this.get('versions.json');
-                    allBibles = json
+                    const allBibles = json
                         .filter(bible => bible.active_api === 1)
                         .map(bible => ({
                             id: bible.id,
@@ -55,9 +65,6 @@ export class BibleOrgBibleRepository implements BibleRepository {
                         }));
                 }
             });
-        }
-        if (languageId) {
-            return allBibles.filter(bible => this.isMatch(bible, languageId));
         }
         return allBibles;
     }

@@ -1,6 +1,5 @@
 import { HasNameAndId } from './../types';
 import { BibleRepository } from './../repositories/bible-repository';
-import * as _ from 'lodash';
 export class IndexBuilder {
     private bibleRepository: BibleRepository;
 
@@ -10,7 +9,7 @@ export class IndexBuilder {
 
     buildOptionsArray(items: HasNameAndId[]): string[] {
         return ['<option></option>'].concat(
-            _.orderBy(items)
+            items
             .map(item => `<option value=${item.id}>${item.name}</option>`)
         );
     }
@@ -40,8 +39,10 @@ export class IndexBuilder {
             comfortableBibleOptions = this.buildOptionsArray(await this.bibleRepository.getBibles(comfortableLanguageId));
         }
         let comfortableChapterText = '';
-        if (comfortableBibleId) {
-            comfortableChapterText = await this.bibleRepository.getChapterText(comfortableBibleId);
+        if (comfortableBibleId && chapterId) {
+            const chapterIdSansBible = chapterId.substr(chapterId.indexOf(':') + 1);
+            const chapterIdForComfortableBible = `${comfortableBibleId}:${chapterIdSansBible}`;
+            comfortableChapterText = await this.bibleRepository.getChapterText(chapterIdForComfortableBible);
         }
         return `<!DOCTYPE html>
 <html>
@@ -81,6 +82,8 @@ export class IndexBuilder {
                 + '&bibleId=' + document.getElementById('bibles').value
                 + '&bookId=' + document.getElementById('books').value
                 + '&chapterId=' + document.getElementById('chapters').value
+                + '&comfortableLanguageId=' + document.getElementById('comfortableLanguages').value
+                + '&comfortableBibleId=' + document.getElementById('comfortableBibles').value
                 ;
         }
 
