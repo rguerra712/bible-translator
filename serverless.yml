@@ -1,14 +1,25 @@
 service:
   name: bible-translator
 
+custom:
+  region: ${opt:region, 'us-east-1'}
+  stage: "${opt:stage, self:provider.stage}"
+  prod:
+    GATEWAY_URL: '/${self:custom.stage}/'
+  dev:
+    GATEWAY_URL: "http://localhost:3000/"
+
+provider:
+  name: aws
+  region: ${self:custom.region}
+  runtime: nodejs8.10
+  environment:
+    TRANSLATE_API_URL: "${self:custom.${self:custom.stage}.GATEWAY_URL}api/translate"
+
 plugins:
   - serverless-dynamic-dotenv
   - serverless-offline
   - serverless-webpack
-
-provider:
-  name: aws
-  runtime: nodejs8.10
 
 functions:
   index:
@@ -17,3 +28,10 @@ functions:
       - http:
           method: get
           path: /
+  translateApi:
+    handler: src/handlers/translate-api.translate
+    events:
+      - http:
+          method: get
+          path: api/translate
+          cors: true

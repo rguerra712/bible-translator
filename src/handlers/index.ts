@@ -5,7 +5,8 @@ import { LanguagesRepository } from '../repositories/languages-repository';
 
 export const index: Handler = async (event: APIGatewayEvent, context: Context, cb: Callback) => {
   // TODO, post backs, ewwwww
-  const indexBuilder = new IndexBuilder(new BibleOrgBibleRepository(new LanguagesRepository()));
+  const languagesRepository = new LanguagesRepository();
+  const indexBuilder = new IndexBuilder(new BibleOrgBibleRepository(languagesRepository), languagesRepository);
   const queryStringParameters = event.queryStringParameters || {};
   const languageId = queryStringParameters.languageId;
   const bibleId = queryStringParameters.bibleId;

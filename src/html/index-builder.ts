@@ -1,10 +1,13 @@
 import { HasNameAndId } from './../types';
 import { BibleRepository } from './../repositories/bible-repository';
+import { LanguagesRepository } from '../repositories/languages-repository';
 export class IndexBuilder {
     private bibleRepository: BibleRepository;
+    private languagesRepository: LanguagesRepository;
 
-    constructor(bibleRepository:BibleRepository) {
-        this.bibleRepository = bibleRepository;    
+    constructor(bibleRepository: BibleRepository, languagesRepository: LanguagesRepository) {
+        this.bibleRepository = bibleRepository;
+        this.languagesRepository = languagesRepository;   
     }
 
     buildOptionsArray(items: HasNameAndId[]): string[] {
@@ -19,8 +22,10 @@ export class IndexBuilder {
         const languages = await this.bibleRepository.getSupportedLanguages();
         const languagesOptions = this.buildOptionsArray(languages);
         let bibleOptions = [];
+        let iso6391Code = '';
         if (languageId) {
             bibleOptions = this.buildOptionsArray(await this.bibleRepository.getBibles(languageId));
+            iso6391Code = this.languagesRepository.lookupIso6391LanguageCode(languageId);
         }
         let bookOptions = [];
         if (bibleId) {
@@ -52,6 +57,7 @@ export class IndexBuilder {
         </style>
         <meta charset="UTF-8">
         <title>Bible Translator</title>
+        <p id="currentTranslation"></p>
         <label>Select language you want to learn</label>
         <select id="languages" onChange="reloadWithNewOptions()">${languagesOptions}</select>
         <br/>
@@ -96,15 +102,31 @@ export class IndexBuilder {
             document.getElementById('comfortableBibles').value = '${comfortableBibleId}';
         }
 
-        function selectWord() {
-            var s = window.getSelection();
+        async function selectWord() {
+            const s = window.getSelection();
             s.modify('extend','backward','word');        
-            var b = s.toString();
+            const b = s.toString();
 
             s.modify('extend','forward','word');
-            var a = s.toString();
+            const a = s.toString();
             s.modify('move','forward','character');
-            alert(b+a);
+            const word = b + a;
+            const currentTranslation = document.getElementById('currentTranslation');
+            const translated = await translate(word);
+            currentTranslation.innerHTML = 'Translation: ' + translated;
+        }
+
+        async function translate(word) {
+            const url = '${process.env.TRANSLATE_API_URL}?fromLanguageCode=${iso6391Code}&toLanguageCode=en&text=' + word;
+            try {
+                const translationResponse = await fetch(url);
+                if (!translationResponse) {
+                    throw new Error('unable to parse ' + word + ' at ' + url);
+                }
+                return (await translationResponse.json()).translation;
+            } catch (error) {
+                return 'unable to translate ' + error;
+            }
         }
     </script>
 </html>`;
