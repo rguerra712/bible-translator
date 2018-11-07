@@ -32,7 +32,7 @@ export class BibleOrgBibleRepository implements BibleRepository {
     async getSupportedLanguages(): Promise<Language[]> {
         // TODO Huge performance gain, need to revisit
         // const allLanguages = this.languagesRepository.getIso6393Languages();
-        const allLanguages = this.languagesRepository.getIso6393CommonLanguages();
+        const allLanguages = this.languagesRepository.getIso6393LanguagesThatHave6391Codes();
         const allLanguageExcept = allLanguages.filter(language => language.id !== 'eng');
         const languages = [
             { id: 'eng-GB', name: 'English (UK)' },
