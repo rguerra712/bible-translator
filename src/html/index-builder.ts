@@ -57,6 +57,9 @@ export class IndexBuilder {
         </style>
         <meta charset="UTF-8">
         <title>Bible Translator</title>
+    </head>
+    <body onload='setLoadedValues()'>
+    <form>
         <p id="currentTranslation"></p>
         <label>Select language you want to learn</label>
         <select id="languages" onChange="reloadWithNewOptions()">${languagesOptions}</select>
@@ -77,9 +80,6 @@ export class IndexBuilder {
         <select id="comfortableBibles" onChange="reloadWithNewOptions()">${comfortableBibleOptions}</select>
         <br/>
         <div><p id="comfortableChapterText">${comfortableChapterText}</p></div>
-    </head>
-    <body onload='setLoadedValues()'>
-    <form>
     </form>
     </body>
     <script>

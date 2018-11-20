@@ -28,6 +28,12 @@ functions:
       - http:
           method: get
           path: /
+  todaysReading:
+    handler: src/handlers/todays-reading.todaysReading
+    events:
+      - http:
+          method: get
+          path: todays-reading
   translateApi:
     handler: src/handlers/translate-api.translate
     events:
