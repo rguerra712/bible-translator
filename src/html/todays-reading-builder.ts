@@ -37,13 +37,14 @@ export class TodaysReadingBuilder {
                 position: fixed;
                 top: 0;
                 width: 100%;
+                font-size: 35px;
             }
 
             .clickable-text {
                 margin-left: auto;
                 margin-right: auto;
                 width: 100%;
-                font-size: 25px;
+                font-size: 35px;
             }
         </style>
         <meta charset="UTF-8">
